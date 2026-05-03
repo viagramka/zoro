@@ -1,0 +1,515 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>Голосование за игру | Крастакт</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: transparent;
+            min-height: 100vh;
+            padding: 40px 20px;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .game-card {
+            background: #2d2d2d;
+            border-radius: 32px;
+            padding: 32px;
+            margin-bottom: 24px;
+            border: 1px solid #3a3a3a;
+            text-align: center;
+        }
+
+        .game-icon {
+            width: 100px;
+            height: 100px;
+            background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
+            border-radius: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 20px;
+        }
+
+        .game-icon i {
+            font-size: 3rem;
+            color: white;
+        }
+
+        .game-title {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: white;
+            margin-bottom: 8px;
+        }
+
+        .game-id {
+            color: #6c757d;
+            font-size: 0.8rem;
+            margin-bottom: 20px;
+        }
+
+        .nominations {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            margin: 32px 0;
+        }
+
+        .nomination-item {
+            background: #1a1a1a;
+            border-radius: 20px;
+            padding: 20px;
+            cursor: pointer;
+            transition: 0.2s;
+            border: 2px solid #3a3a3a;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .nomination-item:hover {
+            border-color: #fff200;
+            transform: translateX(4px);
+        }
+
+        .nomination-item.selected {
+            border-color: #fff200;
+            background: rgb(209 220 38 / 10%);
+        }
+
+        .nomination-radio {
+    width: 24px;
+    height: 24px;
+    accent-color: #fff200;
+    cursor: pointer;
+}
+
+        .nomination-content {
+            flex: 1;
+        }
+
+        .nomination-title {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: white;
+            margin-bottom: 4px;
+        }
+
+        .nomination-desc {
+            font-size: 0.8rem;
+            color: #adb5bd;
+        }
+
+        .nomination-stats {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: #6c757d;
+            font-size: 0.85rem;
+        }
+
+        .nomination-stats i {
+            color: #dc2626;
+        }
+
+        .vote-btn {
+    width: 100%;
+    background: linear-gradient(135deg, #fff200 0%, #d6cf58 100%);
+    color: black;
+    border: none;
+    padding: 14px;
+    border-radius: 40px;
+    font-weight: 600;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+
+        .vote-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(220, 38, 38, 0.3);
+        }
+
+        .vote-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .already-voted {
+            background: #1a1a1a;
+            border-radius: 20px;
+            padding: 16px;
+            text-align: center;
+            color: #4ade80;
+            margin-top: 20px;
+        }
+
+        .spinner {
+            width: 20px;
+            height: 20px;
+            border: 2px solid rgba(255,255,255,0.3);
+            border-top-color: white;
+            border-radius: 50%;
+            animation: spin 0.6s linear infinite;
+            display: inline-block;
+            margin-right: 8px;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .error-message {
+            background: rgba(220, 38, 38, 0.2);
+            color: #f87171;
+            padding: 16px;
+            border-radius: 16px;
+            text-align: center;
+            margin-bottom: 20px;
+            border: 1px solid rgba(220, 38, 38, 0.3);
+        }
+
+        .success-message {
+            background: rgba(34, 197, 94, 0.2);
+            color: #4ade80;
+            padding: 16px;
+            border-radius: 16px;
+            text-align: center;
+            margin-bottom: 20px;
+            border: 1px solid rgba(34, 197, 94, 0.3);
+        }
+
+        .back-link {
+            display: inline-block;
+            margin-bottom: 20px;
+            color: #adb5bd;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: 0.2s;
+        }
+
+        .back-link:hover {
+            color: #dc2626;
+        }
+
+        .stats-row {
+            display: flex;
+            justify-content: space-around;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid #3a3a3a;
+        }
+
+        .stat-chip {
+            background: #1a1a1a;
+            border-radius: 40px;
+            padding: 8px 16px;
+            font-size: 0.8rem;
+            color: #adb5bd;
+        }
+
+        .stat-chip span {
+            color: #dc2626;
+            font-weight: 700;
+        }
+
+        @media (max-width: 600px) {
+            .game-card {
+                padding: 24px;
+            }
+            .nomination-item {
+                padding: 16px;
+            }
+            .nomination-title {
+                font-size: 0.95rem;
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    
+    
+    <div id="app">
+        <div class="game-card">
+           
+            
+            <div id="nominationsContainer" class="nominations"></div>
+            
+            <button id="voteBtn" class="vote-btn" onclick="submitVote()">
+                Голосовать
+            </button>
+            
+            <div id="messageContainer"></div>
+        </div>
+    </div>
+</div>
+
+<script>
+    const firebaseConfig = {
+        apiKey: "AIzaSyBX0fnvfVbsfTiuksc2JtebtmaltgAS87U",
+        authDomain: "krastakt.firebaseapp.com",
+        databaseURL: "https://krastakt-default-rtdb.firebaseio.com",
+        projectId: "krastakt",
+        storageBucket: "krastakt.firebasestorage.app",
+        messagingSenderId: "53885771537",
+        appId: "1:53885771537:web:d293118c77625af7c136b0"
+    };
+
+    const NOMINATIONS = [
+        { id: 1, name: "Шёпот бесконечности", desc: "Лучшая атмосфера и звуковой дизайн", key: "nominate1" },
+        { id: 2, name: "Грань реальности", desc: "Лучший визуальный стиль и графика", key: "nominate2" },
+        { id: 3, name: "Кровь, пот и пиксели", desc: "За высокую сложность", key: "nominate3" },
+        { id: 4, name: "Лучшая игра года", desc: "Самый идеал за период одного года", key: "nominate4" }
+    ];
+
+    let currentUser = null;
+    let gameId = null;
+    let gameData = null;
+    let selectedNomination = null;
+    let isLoading = false;
+
+    function getRTDBUrl(path) {
+        return `https://krastakt-default-rtdb.firebaseio.com/${path}.json`;
+    }
+
+    async function fetchWithAuth(url) {
+        const savedUser = localStorage.getItem('volgura_user') || sessionStorage.getItem('volgura_user');
+        if (!savedUser) {
+            return null;
+        }
+        const user = JSON.parse(savedUser);
+        const authUrl = url.includes('?') ? `${url}&auth=${user.idToken}` : `${url}?auth=${user.idToken}`;
+        const response = await fetch(authUrl);
+        if (response.status === 401) {
+            localStorage.removeItem('volgura_user');
+            sessionStorage.removeItem('volgura_user');
+            return null;
+        }
+        return response;
+    }
+
+    function getUserId() {
+        const savedUser = localStorage.getItem('volgura_user') || sessionStorage.getItem('volgura_user');
+        if (!savedUser) return null;
+        const user = JSON.parse(savedUser);
+        return user.localId;
+    }
+
+    async function loadGameData() {
+        const urlParams = new URLSearchParams(window.location.search);
+        gameId = urlParams.get('id');
+        
+        if (!gameId) {
+            showError('Страница не поняла, за что голосовать');
+            return;
+        }
+        
+        
+        await loadVotes();
+        renderNominations();
+    }
+
+    async function loadVotes() {
+        const url = getRTDBUrl(`zoroNominate/games/${gameId}`);
+        const response = await fetch(url);
+        if (response.ok) {
+            gameData = await response.json();
+        } else {
+            gameData = {
+                nominate1: 0,
+                nominate2: 0,
+                nominate3: 0,
+                nominate4: 0
+            };
+        }
+        
+        const hasVoted = await checkIfUserVoted();
+        if (hasVoted) {
+            const voteBtn = document.getElementById('voteBtn');
+            if (voteBtn) {
+                voteBtn.disabled = true;
+                voteBtn.style.opacity = '0.6';
+                voteBtn.innerHTML = '<i class="fas fa-check-circle"></i> Вы уже голосовали';
+            }
+        }
+    }
+
+    async function checkIfUserVoted() {
+        const userId = getUserId();
+        if (!userId) return false;
+        
+        const url = getRTDBUrl(`zoroNominate/voters/${gameId}/${userId}`);
+        const response = await fetch(url);
+        if (response.ok) {
+            const data = await response.json();
+            return data === true;
+        }
+        return false;
+    }
+
+    function renderNominations() {
+        const container = document.getElementById('nominationsContainer');
+        
+        container.innerHTML = NOMINATIONS.map(nom => {
+            const voteCount = gameData ? gameData[nom.key] : 0;
+            return `
+                <div class="nomination-item" data-nom="${nom.id}" onclick="selectNomination(${nom.id})">
+                    <input type="radio" name="nomination" class="nomination-radio" value="${nom.id}" id="nom_${nom.id}">
+                    <div class="nomination-content">
+                        <div class="nomination-title">${escapeHtml(nom.name)}</div>
+                        <div class="nomination-desc">${escapeHtml(nom.desc)}</div>
+                    </div>
+                    <div class="nomination-stats">
+                        <span>${voteCount} голосов</span>
+                    </div>
+                </div>
+            `;
+        }).join('');
+    }
+
+    function selectNomination(nomId) {
+        selectedNomination = nomId;
+        
+        document.querySelectorAll('.nomination-item').forEach((item, index) => {
+            const radio = item.querySelector('.nomination-radio');
+            if (radio && parseInt(radio.value) === nomId) {
+                radio.checked = true;
+                item.classList.add('selected');
+            } else if (radio) {
+                radio.checked = false;
+                item.classList.remove('selected');
+            }
+        });
+    }
+
+    async function submitVote() {
+        if (isLoading) return;
+        
+        const savedUser = localStorage.getItem('volgura_user') || sessionStorage.getItem('volgura_user');
+        if (!savedUser) {
+            showMessage('error', 'Войдите в аккаунт, чтобы голосовать');
+            setTimeout(() => {
+                window.location.href = 'login.html';
+            }, 1500);
+            return;
+        }
+        
+        currentUser = JSON.parse(savedUser);
+        
+        if (!selectedNomination) {
+            showMessage('error', 'Выберите номинацию для голосования');
+            return;
+        }
+        
+        const hasVoted = await checkIfUserVoted();
+        if (hasVoted) {
+            showMessage('error', 'Вы уже голосовали за эту игру');
+            return;
+        }
+        
+        isLoading = true;
+        const voteBtn = document.getElementById('voteBtn');
+        const originalText = voteBtn.innerHTML;
+        voteBtn.innerHTML = '<div class="spinner"></div> Обработка...';
+        voteBtn.disabled = true;
+        
+        try {
+            const nomKey = `nominate${selectedNomination}`;
+            const currentVotes = gameData ? gameData[nomKey] : 0;
+            const newVotes = currentVotes + 1;
+            
+            const updateUrl = getRTDBUrl(`zoroNominate/games/${gameId}/${nomKey}`) + `?auth=${currentUser.idToken}`;
+            await fetch(updateUrl, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(newVotes)
+            });
+            
+            const voterUrl = getRTDBUrl(`zoroNominate/voters/${gameId}/${currentUser.localId}`) + `?auth=${currentUser.idToken}`;
+            await fetch(voterUrl, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(true)
+            });
+            
+            if (!gameData) gameData = { nominate1: 0, nominate2: 0, nominate3: 0, nominate4: 0 };
+            gameData[nomKey] = newVotes;
+            
+            const selectedNom = NOMINATIONS.find(n => n.id === selectedNomination);
+            showMessage('success', `Ваш голос принят! Спасибо за участие!`);
+            
+            renderNominations();
+            
+            voteBtn.innerHTML = '<i class="fas fa-check-circle"></i> Вы уже голосовали';
+            voteBtn.disabled = true;
+            voteBtn.style.opacity = '0.6';
+            
+        } catch (err) {
+            console.error('Ошибка голосования:', err);
+            showMessage('error', 'Ошибка при голосовании. Попробуйте позже.');
+            voteBtn.innerHTML = originalText;
+            voteBtn.disabled = false;
+        } finally {
+            isLoading = false;
+        }
+    }
+
+    function showMessage(type, text) {
+        const container = document.getElementById('messageContainer');
+        const className = type === 'error' ? 'error-message' : 'success-message';
+        container.innerHTML = `<div class="${className}"><i class="fas ${type === 'error' ? 'fa-exclamation-triangle' : 'fa-check-circle'}"></i> ${escapeHtml(text)}</div>`;
+        
+        setTimeout(() => {
+            if (container.innerHTML) {
+                container.innerHTML = '';
+            }
+        }, 5000);
+    }
+
+    function showError(text) {
+        const container = document.getElementById('nominationsContainer');
+        container.innerHTML = `<div class="error-message"><i class="fas fa-exclamation-triangle"></i> ${escapeHtml(text)}</div>`;
+    }
+
+    function escapeHtml(str) {
+        if (!str) return '';
+        return str.replace(/[&<>]/g, function(m) {
+            if (m === '&') return '&amp;';
+            if (m === '<') return '&lt;';
+            if (m === '>') return '&gt;';
+            return m;
+        });
+    }
+
+    window.selectNomination = selectNomination;
+    window.submitVote = submitVote;
+
+    loadGameData();
+</script>
+</body>
+</html>
